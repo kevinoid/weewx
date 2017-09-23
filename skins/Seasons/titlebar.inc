@@ -15,7 +15,7 @@
       #for $monthYear in $SummaryByMonth
       <option value="$monthYear">$monthYear</option>
       #end for
-      <option selected>- Select Month -</option>
+      <option selected="selected">- Select Month -</option>
     </select>
     <br/>
     Yearly Reports:
@@ -23,7 +23,7 @@
       #for $yr in $SummaryByYear
       <option value="$yr">$yr</option>
       #end for
-      <option selected>- Select Year -</option>
+      <option selected="selected">- Select Year -</option>
     </select>
     <br/>
   </div>
