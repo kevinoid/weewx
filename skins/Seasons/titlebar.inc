@@ -22,7 +22,7 @@
       #for $monthYear in $SummaryByMonth
       <option value="$monthYear">$monthYear</option>
       #end for
-      <option selected>- $gettext("select month") -</option>
+      <option selected="selected">- $gettext("select month") -</option>
     </select>
     <br/>
     $gettext("Yearly Reports"):
@@ -30,7 +30,7 @@
       #for $yr in $SummaryByYear
       <option value="$yr">$yr</option>
       #end for
-      <option selected>- $gettext("select year") -</option>
+      <option selected="selected">- $gettext("select year") -</option>
     </select>
     <br/>
   </div>
