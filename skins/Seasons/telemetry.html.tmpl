@@ -10,8 +10,8 @@
 {'data': $period.consBatteryVoltage, 'img': 'volt', 'alt': 'voltage'}
 ]
 #if $x['data'].has_data
-#set $img = "%s%s.png" % ($label, $x['img'])
-<img src="$img" alt="$x['alt']" />
+#set $img = "%s%s" % ($label, $x['img'])
+<img src="${img}.png" data-plotly="${img}.plotly.json" alt="$x['alt']" />
 #end if
 #end for
 </div>
@@ -24,6 +24,7 @@
     <title>$station.location Telemetry</title>
     <link rel="icon" type="image/png" href="favicon.ico" />
     <link rel="stylesheet" type="text/css" href="seasons.css"/>
+    <script type="text/javascript" src="plotly-basic-1.31.2.min.js"></script>
     <script type="text/javascript" src="seasons.js"></script>
   </head>
 
@@ -61,6 +62,5 @@
 
       #include "identifier.inc"
     </div>
-
   </body>
 </html>

@@ -32,6 +32,7 @@ function setup(widgets) {
 function choose_history(id) {
   choose_div('history', id, ['day', 'week', 'month', 'year']);
   choose_col('hilo', id, ['week', 'month', 'year']);
+  loadDescendantPlots(document.getElementById('history_' + id));
 }
 
 function toggle_widget(id, state) {
@@ -50,7 +51,7 @@ function toggle_widget(id, state) {
   }
 }
 
-function choose_col(group, selected_id, all_ids) { 
+function choose_col(group, selected_id, all_ids) {
   for(var i=0; i<all_ids.length; i++) {
     var items = document.getElementsByClassName(group + '_' + all_ids[i]);
     if(items) {
@@ -139,4 +140,109 @@ function openTabularFile(date) {
   if (date.match(/^\d\d\d\d/)) {
     window.location = "tabular.html?report=NOAA/NOAA-" + date + ".txt";
   }
+}
+
+/** Attempts to disable (pre-)loading and display of an image by settings its
+ * src attribute to a placeholder value (and saving it in data-src for possible
+ * later use as fallback).
+ * @param {!HTMLImageElement} img <img> element to disable.
+ * @see enableImgLoad
+ */
+function disableImg(img) {
+  img.setAttribute('data-src', img.src);
+  // Transparent gif <https://stackoverflow.com/a/15960901/503410>
+  img.src =
+    'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAI=';
+}
+
+/** (Re-)Enable loading of an image which was previously disabled.
+ * @param {!HTMLImageElement} img <img> element to enable.
+ * @see disableImgLoad
+ */
+function enableImg(img) {
+  var src = img.getAttribute('data-src');
+  if (src) {
+    img.src = src;
+    img.removeAttribute('data-src');
+  }
+}
+
+/** Attempts to disable (pre-)loading of images which will be replaced by
+ * plotly.js charts by setting the src attribute to a placeholder value .
+ */
+function disablePlotlyImgs() {
+  Array.prototype.forEach.call(
+    document.querySelectorAll('img[data-plotly]'),
+    disableImg
+  );
+}
+document.addEventListener('DOMContentLoaded', disablePlotlyImgs);
+
+/** Fetches then parses JSON from a URL.
+ * @param {string} jsonUrl URL of JSON to fetch.
+ * @param {function(Error, *)} cb Callback with Error or parsed JSON value.
+ */
+function getJson(jsonUrl, cb) {
+  var req = new XMLHttpRequest();
+  req.onerror = cb;
+  req.onload = function() {
+    if (this.status >= 300) {
+      cb(new Error('HTTP ' + this.status + ' ' + this.statusText));
+      return;
+    }
+
+    var body;
+    try {
+      body = JSON.parse(this.responseText);
+    } catch (err) {
+      cb(err);
+      return;
+    }
+    cb(null, body);
+  };
+  req.open('GET', jsonUrl);
+  req.setRequestHeader('Accept', 'application/json');
+  req.send();
+}
+
+/** Loads a plotly.js plot for a given element.
+ * @param {!HTMLElement} plotElement Element to replace with a plotly.js
+ * plot loaded from its data-plotly attribute.
+ */
+function loadPlot(plotElem) {
+  var plotlyUrl = plotElem.getAttribute('data-plotly');
+  getJson(plotlyUrl, function(err, plot) {
+    if (err) {
+      enableImg(plotElem);
+      console.error('Error fetching ' + plotlyUrl, err);
+      return;
+    }
+
+    var plotParent = plotElem.parentNode;
+    var plotlyPlotDiv = document.createElement('div');
+    plotParent.replaceChild(plotlyPlotDiv, plotElem);
+    try {
+      Plotly.newPlot(plotlyPlotDiv, plot.data, plot.layout, {
+        displaylogo: false,
+        modeBarButtonsToRemove: [
+          'sendDataToCloud'
+        ],
+        showLink: false
+      });
+    } catch (errPlotly) {
+      console.error('Error rendering plot from ' + plotlyUrl, errPlotly);
+      enableImg(plotElem);
+      plotParent.replaceChild(plotElem, plotlyPlotDiv);
+    }
+  });
+}
+
+/** Loads plotly.js plots for descendants of a given element.
+ * @param {!Element} plotContainer Element below which to load all plots.
+ */
+function loadDescendantPlots(plotContainer) {
+  Array.prototype.forEach.call(
+    plotContainer.querySelectorAll('[data-plotly]'),
+    loadPlot
+  );
 }
