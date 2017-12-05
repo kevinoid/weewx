@@ -38,6 +38,7 @@ function choose_history(id) {
     choose_col('hilo', id, ['week', 'month', 'year', 'rainyear']);
     choose_col('totals', id, ['week', 'month', 'year', 'rainyear']);
     choose_rainyear(id);
+    loadDescendantPlots(document.getElementById('history_' + id));
 }
 
 function choose_rainyear(id) {
@@ -194,4 +195,124 @@ function openTabularFile(date) {
     if (date.match(/^\d\d\d\d/)) {
         window.location = "tabular.html?report=NOAA/NOAA-" + date + ".txt";
     }
+}
+
+/** Fetches then parses JSON from a URL.
+ * @param {string} jsonUrl URL of JSON to fetch.
+ * @param {function(Error, *)} cb Callback with Error or parsed JSON value.
+ */
+function getJson(jsonUrl, cb) {
+    const req = new XMLHttpRequest();
+    req.onerror = cb;
+    req.onload = function() {
+        if (this.status >= 300) {
+            cb(new Error('HTTP ' + this.status + ' ' + this.statusText));
+            return;
+        }
+
+        let body;
+        try {
+            body = JSON.parse(this.responseText);
+        } catch (err) {
+            cb(err);
+            return;
+        }
+        cb(null, body);
+    };
+    req.open('GET', jsonUrl);
+    req.setRequestHeader('Accept', 'application/json');
+    req.send();
+}
+
+/** Creates a plotly.js plot from given data+layout to replace a given element.
+ * @param {!HTMLElement} plotElement Element to replace with a plotly.js plot.
+ * @param {!Object} plotData Data for the plot.
+ * @param {!Object} plotLayout Layout for the plot.
+ */
+function newPlotFromData(plotElem, plotData, plotLayout) {
+    const plotParent = plotElem.parentNode;
+    const plotlyPlotDiv = document.createElement('div');
+    plotParent.replaceChild(plotlyPlotDiv, plotElem);
+    try {
+        Plotly.newPlot(plotlyPlotDiv, plotData, plotLayout, {
+            displaylogo: false,
+            modeBarButtonsToRemove: [
+                'sendDataToCloud'
+            ],
+            showLink: false
+        });
+    } catch (errPlotly) {
+        plotParent.replaceChild(plotElem, plotlyPlotDiv);
+        plotElem.removeAttribute('data-plotly');
+    }
+}
+
+/** Loads a plotly.js plot for a given element.
+ * @param {!HTMLElement} plotElement Element to replace with a plotly.js
+ * plot loaded from its data-plotly attribute.
+ */
+function loadPlot(plotElem) {
+    const plotlyUrl = plotElem.getAttribute('data-plotly');
+    getJson(plotlyUrl, function(err, plot) {
+        if (err) {
+            console.error('Error fetching ' + plotlyUrl, err);
+            plotElem.removeAttribute('data-plotly');
+            return;
+        }
+
+        function newPlot() {
+            try {
+                newPlotFromData(plotElem, plot.data, plot.layout);
+            } catch (errPlotly) {
+                console.error(
+                    'Error rendering plot from ' + plotlyUrl,
+                    errPlotly
+                );
+            }
+        }
+
+        // If browser supports CSS Font Loading API, use it to pre-load fonts.
+        // Necessary to avoid clipping annotations with web fonts on Chrome.
+        if (plot.fonts
+                && document.fonts
+                && typeof document.fonts.load === 'function') {
+            const fonts = plot.fonts
+                .map(function fontFaceToCssFontProp(font) {
+                    return [
+                        // size is required by font property syntax
+                        // Probably ignored here, since not part of @font-face
+                        font.size || '1em',
+                        font.style,
+                        font.variant,
+                        font.weight,
+                        font.stretch,
+                        // Quote font family if necessary
+                        !font.family || /^[_a-zA-Z][_a-zA-Z0-9-]*$/.test(font.family)
+                            ? font.family
+                            : '"' + font.family + '"'
+                    ]
+                        .filter(Boolean)
+                        .join(' ');
+                });
+            document.fonts.load(fonts).then(
+                newPlot,
+                function(errFontsLoad) {
+                    console.error('Error loading fonts: ', errFontsLoad);
+                    newPlot();
+                }
+            );
+        } else {
+            newPlot();
+        }
+    });
+}
+
+/** Loads plotly.js plots for descendants of a given element.
+ * @param {!Element} plotContainer Element below which to load all plots.
+ */
+function loadDescendantPlots(plotContainer) {
+    Array.prototype.forEach.call(
+        plotContainer.querySelectorAll('[data-plotly]'),
+        loadPlot
+    );
 }

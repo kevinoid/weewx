@@ -32,6 +32,13 @@
         url('font/OpenSans.woff') format('woff');
 }
 
+@font-face {
+    font-family: 'Open Sans Bold';
+    font-weight: 700;
+    src: url('font/OpenSans-Bold.woff') format('woff'),
+    url('font/OpenSans-Bold.woff2') format('woff2');
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -224,7 +231,9 @@ a:hover {
     margin-right: 5px;
 }
 
-.widget img {
+.widget img,
+.widget .js-plotly-plot {
+    display: inline-block;
     width: 350px;
     border: 1px solid var(--section-border-color);
     margin-top: 4px;
@@ -275,7 +284,8 @@ a:hover {
     padding-top: 10px;
 }
 
-#history_widget img {
+#history_widget img,
+#history_widget .js-plotly-plot {
     border: none;
     margin-bottom: 10px;
     width: 500px; /* should match the image width in skin.conf */
