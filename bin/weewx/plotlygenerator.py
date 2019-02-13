@@ -8,6 +8,7 @@
 Based on weewx.imagegenerator.ImageGenerator."""
 
 from __future__ import with_statement
+from __future__ import absolute_import
 
 import cmath
 import datetime
