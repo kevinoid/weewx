@@ -17,7 +17,6 @@ import json
 import locale
 import math
 import os.path
-import syslog
 import time
 
 import weeplot.genplot
@@ -26,6 +25,7 @@ import weeutil.weeutil
 import weewx.reportengine
 import weewx.units
 from weeutil.config import search_up
+from weeutil.log import logdbg, loginf, logerr, logcrt
 from weeutil.weeutil import to_bool, to_int, to_float
 from weewx.units import ValueTuple
 
@@ -116,7 +116,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     try:
                         last_mod = os.path.getmtime(img_file)
                         if t_now - last_mod < stale:
-                            syslog.syslog(syslog.LOG_DEBUG, "plotlygenerator: Skip '%s': last_mod=%s age=%s stale=%s" % (img_file, last_mod, t_now - last_mod, stale))
+                            logdbg("Skip '%s': last_mod=%s age=%s stale=%s" %
+                                   (img_file, last_mod, t_now - last_mod, stale))
                             continue
                     except os.error:
                         pass
@@ -199,8 +200,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                             # Aggregation specified. Get the interval.
                             aggregate_interval = line_options.as_int('aggregate_interval')
                         except KeyError:
-                            syslog.syslog(syslog.LOG_ERR, "plotlygenerator: aggregate interval required for aggregate type %s" % aggregate_type)
-                            syslog.syslog(syslog.LOG_ERR, "plotlygenerator: line type %s skipped" % var_type)
+                            logerr("Aggregate interval required for aggregate type %s" % aggregate_type)
+                            logerr("Line type %s skipped" % var_type)
                             continue
 
                     # Now its time to find and hit the database:
@@ -296,7 +297,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                             gap_fraction = to_float(line_options.get('line_gap_fraction'))
                         if gap_fraction is not None:
                             if not 0 < gap_fraction < 1:
-                                syslog.syslog(syslog.LOG_ERR, "plotlygenerator: Gap fraction %5.3f outside range 0 to 1. Ignored." % gap_fraction)
+                                logerr("Gap fraction %5.3f outside range 0 to 1. Ignored." % gap_fraction)
                                 gap_fraction = None
 
                     # Get the type of line (only 'solid' or 'none' for now)
@@ -363,11 +364,11 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                             separators=(',', ':'))
                     ngen += 1
                 except IOError as e:
-                    syslog.syslog(syslog.LOG_CRIT, "plotlygenerator: Unable to save to file '%s': %s" % (img_file, e))
+                    logcrt("Unable to save to file '%s' %s:" % (img_file, e))
         t2 = time.time()
 
         if log_success:
-            syslog.syslog(syslog.LOG_INFO, "plotlygenerator: Generated %d images for %s in %.2f seconds" % (ngen, self.skin_dict['REPORT_NAME'], t2 - t1))
+            loginf("Generated %d images for %s in %.2f seconds" % (ngen, self.skin_dict['REPORT_NAME'], t2 - t1))
 
 
     def _gen_line(
