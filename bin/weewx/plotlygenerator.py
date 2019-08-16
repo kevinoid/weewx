@@ -7,27 +7,30 @@
 """Generate JSON data files for plotly.js plots for up to an effective date.
 Based on weewx.imagegenerator.ImageGenerator."""
 
-from __future__ import with_statement
 from __future__ import absolute_import
+from __future__ import with_statement
 
 import cmath
 import datetime
 import itertools
 import json
 import locale
+import logging
 import math
 import os.path
 import time
 
 import weeplot.genplot
 import weeplot.utilities
+import weeutil.logging
 import weeutil.weeutil
 import weewx.reportengine
 import weewx.units
 from weeutil.config import search_up
-from weeutil.log import logdbg, loginf, logerr, logcrt
 from weeutil.weeutil import to_bool, to_int, to_float
 from weewx.units import ValueTuple
+
+log = logging.getLogger(__name__)
 
 # =============================================================================
 #                    Class PlotlyJSONGenerator
@@ -116,8 +119,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     try:
                         last_mod = os.path.getmtime(img_file)
                         if t_now - last_mod < stale:
-                            logdbg("Skip '%s': last_mod=%s age=%s stale=%s" %
-                                   (img_file, last_mod, t_now - last_mod, stale))
+                            log.debug("Skip '%s': last_mod=%s age=%s stale=%s",
+                                      img_file, last_mod, t_now - last_mod, stale)
                             continue
                     except os.error:
                         pass
@@ -200,8 +203,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                             # Aggregation specified. Get the interval.
                             aggregate_interval = line_options.as_int('aggregate_interval')
                         except KeyError:
-                            logerr("Aggregate interval required for aggregate type %s" % aggregate_type)
-                            logerr("Line type %s skipped" % var_type)
+                            log.error("Aggregate interval required for aggregate type %s", aggregate_type)
+                            log.error("Line type %s skipped", var_type)
                             continue
 
                     # Now its time to find and hit the database:
@@ -297,7 +300,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                             gap_fraction = to_float(line_options.get('line_gap_fraction'))
                         if gap_fraction is not None:
                             if not 0 < gap_fraction < 1:
-                                logerr("Gap fraction %5.3f outside range 0 to 1. Ignored." % gap_fraction)
+                                log.error("Gap fraction %5.3f outside range 0 to 1. Ignored.", gap_fraction)
                                 gap_fraction = None
 
                     # Get the type of line (only 'solid' or 'none' for now)
@@ -364,11 +367,11 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                             separators=(',', ':'))
                     ngen += 1
                 except IOError as e:
-                    logcrt("Unable to save to file '%s' %s:" % (img_file, e))
+                    log.error("Unable to save to file '%s' %s:", img_file, e)
         t2 = time.time()
 
         if log_success:
-            loginf("Generated %d images for %s in %.2f seconds" % (ngen, self.skin_dict['REPORT_NAME'], t2 - t1))
+            log.info("Generated %d images for %s in %.2f seconds", ngen, self.skin_dict['REPORT_NAME'], t2 - t1)
 
 
     def _gen_line(
