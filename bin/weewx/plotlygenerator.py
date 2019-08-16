@@ -22,11 +22,11 @@ import time
 
 import weeplot.genplot
 import weeplot.utilities
-import weeutil.logging
+import weeutil.logger
 import weeutil.weeutil
 import weewx.reportengine
 import weewx.units
-from weeutil.config import search_up
+from weeutil.config import search_up, accumulateLeaves
 from weeutil.weeutil import to_bool, to_int, to_float
 from weewx.units import ValueTuple
 
@@ -91,8 +91,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
             for plotname in self.image_dict[timespan].sections:
 
                 # Accumulate all options from parent nodes:
-                plot_options = weeutil.weeutil.accumulateLeaves(
-                    self.image_dict[timespan][plotname])
+                plot_options = accumulateLeaves(self.image_dict[timespan][plotname])
 
                 plotgen_ts = gen_ts
                 if not plotgen_ts:
@@ -185,7 +184,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     line_num += 1
 
                     # Accumulate options from parent nodes.
-                    line_options = weeutil.weeutil.accumulateLeaves(self.image_dict[timespan][plotname][line_name])
+                    line_options = accumulateLeaves(self.image_dict[timespan][plotname][line_name])
                     # accumulateLeaves does not preserve .name
                     line_options.name = line_name
 
