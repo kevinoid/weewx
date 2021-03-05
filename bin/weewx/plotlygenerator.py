@@ -107,7 +107,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 # Get the path that the image is going to be saved to:
                 img_file = os.path.join(image_root, '%s.plotly.json' % plotname)
 
-                ai = to_int(plot_options.get('aggregate_interval'))
+                # Convert from string to an integer:
+                ai = weeutil.weeutil.nominal_spans(plot_options.get('aggregate_interval'))
                 # Check whether this plot needs to be done at all:
                 if skipThisPlot(plotgen_ts, ai, img_file):
                     continue
@@ -201,7 +202,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     else:
                         try:
                             # Aggregation specified. Get the interval.
-                            aggregate_interval = line_options.as_int('aggregate_interval')
+                            aggregate_interval = weeutil.weeutil.nominal_spans(line_options['aggregate_interval'])
                         except KeyError:
                             log.error("Aggregate interval required for aggregate type %s", aggregate_type)
                             log.error("Line type %s skipped", var_type)
