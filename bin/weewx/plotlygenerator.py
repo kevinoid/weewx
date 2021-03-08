@@ -175,9 +175,9 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     x_label_format = _get_time_format(minstamp, maxstamp)
 
                 # Initialize variables used in and after loop
-                line_options = None
                 last_vector_options = None
                 last_vector_line_num = 0
+                unit_label = None
 
                 # Loop over each line to be added to the plot.
                 data = []
@@ -231,6 +231,13 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     new_start_vec_t = self.converter.convert(start_vec_t)
                     new_stop_vec_t  = self.converter.convert(stop_vec_t)
                     new_data_vec_t = self.converter.convert(data_vec_t)
+
+                    # Add a unit label. NB: all will get overwritten except the
+                    # last. Get the label from the configuration dictionary.
+                    unit_label = line_options.get('y_label', self.formatter.get_label_string(new_data_vec_t[1]))
+                    # Strip off any leading and trailing whitespace so it's
+                    # easy to center
+                    unit_label = unit_label.strip()
 
                     # Remove missing data, for the following reasons:
                     # - Avoids checks during conversion/scaling.
@@ -326,7 +333,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                         vector_rotate = vector_rotate,
                         gap_fraction  = gap_fraction,
                         x_label_format = x_label_format,
-                        y_label        = self._get_y_label(line_options),
+                        y_label        = unit_label,
                         minstamp       = minstamp,
                         maxstamp       = maxstamp,
                         miny           = miny,
@@ -336,10 +343,6 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     if line_options.get('plot_type') == 'vector':
                         last_vector_line_num = line_num
                         last_vector_options = line_options
-
-                y_label = None
-                if line_options is not None:
-                    y_label = self._get_y_label(line_options)
 
                 plotly_data = self._gen_plotly(
                     plot                 = plot,
@@ -352,7 +355,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     miny                 = miny,
                     maxy                 = maxy,
                     x_label_format       = x_label_format,
-                    y_label              = y_label,
+                    y_label              = unit_label,
                     bottom_label         = bottom_label,
                     last_vector_options  = last_vector_options,
                     last_vector_line_num = last_vector_line_num,
@@ -809,18 +812,6 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 for x in transitions[1:-1])
 
         return daynight_shapes
-
-
-    def _get_y_label(self, line_options):
-        """Gets the y-axis label for a line with given options"""
-        y_label = line_options.get('y_label')
-        if y_label is None:
-            var_type = line_options.get('data_type', line_options.name)
-            y_label = weewx.units.get_label_string(
-                self.formatter,
-                self.converter,
-                var_type)
-        return y_label.strip()
 
 
 def _add_gaps(x, y, maxdx):
