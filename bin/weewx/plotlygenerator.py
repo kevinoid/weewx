@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2009-2015 Tom Keffer <tkeffer@gmail.com>
+#    Copyright (c) 2009-2021 Tom Keffer <tkeffer@gmail.com>
 #    Copyright (c) 2017-2021 Kevin Locke <kevin@kevinlocke.name>
 #
 #    See the file LICENSE.txt for your full rights.
@@ -32,6 +32,7 @@ from weeutil.weeutil import to_bool, to_int, to_float, TimeSpan
 from weewx.units import ValueTuple
 
 log = logging.getLogger(__name__)
+
 
 # =============================================================================
 #                    Class PlotlyJSONGenerator
@@ -72,12 +73,13 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
     def genImages(self, gen_ts):
         """Generate plotly JSON files.
 
-        The time scales will be chosen to include the given timestamp, with
-        nice beginning and ending times.
+        The time scales will be chosen to include the given timestamp, with nice beginning and
+        ending times.
 
-        gen_ts: The time around which plots are to be generated. This will
-        also be used as the bottom label in the plots. [optional. Default is
-        to use the time of the last record in the database.]
+        Args:
+            gen_ts (int): The time around which plots are to be generated. This will also be used
+                as the bottom label in the plots. [optional. Default is to use the time of the last
+                record in the database.]
         """
         t1 = time.time()
         ngen = 0
@@ -115,7 +117,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
 
                 # skip image files that are fresh, but only if staleness is defined
                 stale = to_int(plot_options.get('stale_age'))
-                if stale is not None:
+                if stale:
                     t_now = time.time()
                     try:
                         last_mod = os.path.getmtime(img_file)
@@ -126,8 +128,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     except os.error:
                         pass
 
-                # Create the subdirectory that the image is to be put in.
-                # Wrap in a try block in case it already exists.
+                # Create the subdirectory that the image is to be put in. Wrap in a try block in
+                # case it already exists.
                 try:
                     os.makedirs(os.path.dirname(img_file))
                 except OSError:
@@ -137,15 +139,16 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 plot = weeplot.genplot.TimePlot(plot_options)
 
                 # Calculate a suitable min, max time for the requested time.
-                (minstamp, maxstamp, timeinc) = weeplot.utilities.scaletime(plotgen_ts - int(plot_options.get('time_length', 86400)), plotgen_ts)
+                minstamp, maxstamp, timeinc = weeplot.utilities.scaletime(
+                    plotgen_ts - int(plot_options.get('time_length', 86400)), plotgen_ts)
                 # Override the x interval if the user has given an explicit interval:
                 timeinc_user = to_int(plot_options.get('x_interval'))
                 if timeinc_user is not None:
                     timeinc = timeinc_user
 
                 # Set the y-scaling, using any user-supplied hints:
-                miny, maxy, incy = weeutil.weeutil.convertToFloat(
-                    plot_options.get('yscale', ['None', 'None', 'None']))
+                yscale = plot_options.get('yscale', ['None', 'None', 'None'])
+                yscale = weeutil.weeutil.convertToFloat(yscale)
 
                 # Get a suitable bottom label:
                 bottom_label_format = plot_options.get('bottom_label_format', '%m/%d/%y %H:%M')
@@ -336,8 +339,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                         y_label        = unit_label,
                         minstamp       = minstamp,
                         maxstamp       = maxstamp,
-                        miny           = miny,
-                        maxy           = maxy,
+                        yscale         = yscale,
                         plotsize       = plotsize))
 
                     if line_options.get('plot_type') == 'vector':
@@ -352,8 +354,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     margin               = margin,
                     minstamp             = minstamp,
                     maxstamp             = maxstamp,
-                    miny                 = miny,
-                    maxy                 = maxy,
+                    yscale               = yscale,
                     x_label_format       = x_label_format,
                     y_label              = unit_label,
                     bottom_label         = bottom_label,
@@ -398,8 +399,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
             y_label,
             minstamp,
             maxstamp,
-            miny,
-            maxy,
+            yscale,
             plotsize,
             ):
         if marker_type is not None:
@@ -497,19 +497,21 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 rotated = y
             y = [d.imag for d in rotated]
             z = [d.real for d in rotated]
-            xscale = float(maxstamp - minstamp) / plotsize[0]
-            if miny is not None and maxy is not None:
-                yrange = maxy - miny
+
+            xpscale = float(maxstamp - minstamp) / plotsize[0]
+            if yscale[0] is not None and yscale[1] is not None:
+                yrange = yscale[1] - yscale[0]
             else:
                 yrange = max(y) - min(y)
-            yscale = float(yrange) / plotsize[1]
-            xyscale = xscale / yscale
+            ypscale = float(yrange) / plotsize[1]
+            xypscale = xpscale / ypscale
+
             lines = []
             for x0, y0, z0, (r, phi) in zip(x, y, z, polar):
                 line = line_data.copy()
                 line['x'] = [
                     _time_to_iso(x0),
-                    _time_to_iso(x0 + z0 * xyscale)
+                    _time_to_iso(x0 + z0 * xypscale)
                     ]
                 line['y'] = [0, y0]
                 x0_str = time.strftime(x_label_format, time.localtime(x0))
@@ -539,8 +541,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
             margin,
             minstamp,
             maxstamp,
-            miny,
-            maxy,
+            yscale,
             x_label_format,
             y_label,
             bottom_label,
@@ -628,8 +629,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
             'annotations': annotations,
             }
 
-        if miny is not None and maxy is not None:
-            layout['yaxis']['range'] = [miny, maxy]
+        if yscale[0] is not None and yscale[1] is not None:
+            layout['yaxis']['range'] = yscale[0:2]
 
         if plot.image_background_color != plot.chart_background_color:
             # Add top bar with chart bg color to match ImageGenerator
