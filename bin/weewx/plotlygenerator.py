@@ -230,9 +230,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                         stop_vec_t = ValueTuple([x - aggregate_interval / 2.0 for x in stop_vec_t[0]],
                                                 stop_vec_t[1], stop_vec_t[2])
 
-                    # Do any necessary unit conversions:
-                    new_start_vec_t = self.converter.convert(start_vec_t)
-                    new_stop_vec_t  = self.converter.convert(stop_vec_t)
+                    # Convert the data to the requested units
                     new_data_vec_t = self.converter.convert(data_vec_t)
 
                     # Add a unit label. NB: all will get overwritten except the
@@ -248,17 +246,17 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     # - Does not cause line breaks in line plots.
                     new_data_values = new_data_vec_t[0]
                     if None in new_data_values:
-                        new_start_vec_t = ValueTuple(
-                            [v for i, v in enumerate(new_start_vec_t[0])
+                        start_vec_t = ValueTuple(
+                            [v for i, v in enumerate(start_vec_t[0])
                              if new_data_values[i] is not None],
-                            new_start_vec_t[1],
-                            new_start_vec_t[2]
+                            start_vec_t[1],
+                            start_vec_t[2]
                             )
-                        new_stop_vec_t = ValueTuple(
-                            [v for i, v in enumerate(new_stop_vec_t[0])
+                        stop_vec_t = ValueTuple(
+                            [v for i, v in enumerate(stop_vec_t[0])
                              if new_data_values[i] is not None],
-                            new_stop_vec_t[1],
-                            new_stop_vec_t[2]
+                            stop_vec_t[1],
+                            stop_vec_t[2]
                             )
                         new_data_vec_t = ValueTuple(
                             [v for v in new_data_values if v is not None],
@@ -305,7 +303,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                         vector_rotate = None
 
                         if plot_type == 'bar':
-                            interval_vec = [x[1] - x[0]for x in zip(new_start_vec_t.value, new_stop_vec_t.value)]
+                            interval_vec = [x[1] - x[0]for x in zip(start_vec_t.value, stop_vec_t.value)]
                         elif plot_type == 'line':
                             gap_fraction = to_float(line_options.get('line_gap_fraction'))
                         if gap_fraction is not None:
@@ -323,7 +321,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     
                     # Add the line to the emerging plot:
                     data.extend(self._gen_line(
-                        new_stop_vec_t[0], new_data_vec_t[0],
+                        stop_vec_t[0], new_data_vec_t[0],
                         label         = label,
                         color         = color,
                         fill_color    = fill_color,
