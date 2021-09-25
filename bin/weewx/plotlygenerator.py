@@ -189,6 +189,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 last_vector_line_num = 0
                 unit_label = None
 
+                have_some_data = False
+
                 # Loop over each line to be added to the plot.
                 data = []
                 line_num = -1;
@@ -366,6 +368,9 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                         last_vector_line_num = line_num
                         last_vector_options = line_options
 
+                    # Any data in this line? If so, then set have_some_data to True
+                    have_some_data |= any(x for x in new_data_vec_t[0] if x is not None)
+
                 plotly_data = self._gen_plotly(
                     plot                 = plot,
                     data                 = data,
@@ -382,16 +387,18 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     last_vector_line_num = last_vector_line_num,
                     )
 
-                try:
-                    with open(img_file, 'w') as json_file:
-                        json.dump(
-                            plotly_data,
-                            json_file,
-                            # Use separators without spaces to reduce file size
-                            separators=(',', ':'))
-                    ngen += 1
-                except IOError as e:
-                    log.error("Unable to save to file '%s' %s:", img_file, e)
+                # We can skip this plot if skip_if_empty is True, and there's nothing in the plot
+                if not to_bool(plot_options.get('skip_if_empty', False)) or have_some_data:
+                    try:
+                        with open(img_file, 'w') as json_file:
+                            json.dump(
+                                plotly_data,
+                                json_file,
+                                # Use separators without spaces to reduce file size
+                                separators=(',', ':'))
+                        ngen += 1
+                    except IOError as e:
+                        log.error("Unable to save to file '%s' %s:", img_file, e)
         t2 = time.time()
 
         if log_success:
