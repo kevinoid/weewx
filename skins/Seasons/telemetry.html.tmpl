@@ -24,11 +24,9 @@
     #if $station.station_url
     <link rel="canonical" href="$station.station_url/$filename" />
     #end if
-    <script src="plotly-basic-2.20.0.min.js"></script>
-    <script src="seasons.js"></script>
   </head>
 
-  <body onload="setup();">
+  <body>
     #include "titlebar.inc"
     
     <div id="contents">
@@ -77,6 +75,10 @@
 
       #include "identifier.inc"
     </div>
+
+    <script src="plotly-basic-2.20.0.min.js"></script>
+    <script src="seasons.js"></script>
+    <script>setup();</script>
 
   </body>
 </html>
