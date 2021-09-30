@@ -627,6 +627,9 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
             'margin': margin,
             'shapes': shapes,
             'annotations': annotations,
+            # Note: Default changed to closest in Plotly 2.0:
+            # https://github.com/plotly/plotly.js/pull/5647
+            'hovermode': 'x',
             }
 
         if yscale[0] is not None and yscale[1] is not None:
