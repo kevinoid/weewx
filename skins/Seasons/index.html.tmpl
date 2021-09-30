@@ -58,6 +58,19 @@
 
 #for period in $periods
           <div id="history_${period}" class="plot_container" style="display:none">
+  ## Show hilow only for year, and only if there is data
+  #if $period == 'year'
+    #set $plot_name = $period + 'hilow'
+    #set $show_plot = 0
+    #for obs in $getobs($plot_name)
+      #if $recent.check_for_data($obs)
+        #set $show_plot = 1
+      #end if
+    #end for
+    #if $show_plot
+            <img src="${plot_name}.png" data-plotly="${plot_name}.plotly.json" alt="${plot_name}"/>
+    #end if
+  #end if
   #for plot_group in $plot_groups
     #set $show_plot = 0
     #*
