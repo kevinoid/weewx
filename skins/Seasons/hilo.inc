@@ -19,7 +19,7 @@
   <div class="widget_title">
     <a href="statistics.html">$gettext("Statistics")</a>
     <a class="widget_control"
-      onclick="toggle_widget('hilo')">&diams;</a>
+      onclick="toggle_widget('hilo')">&#x2666;</a>
   </div>
 
   <div class="widget_contents">
@@ -27,11 +27,11 @@
     <tbody>
       <tr>
         <td></td>
-        <th>&nbsp;<br/>$gettext("Today")</th>
-        <th class="hilo_week">&nbsp;<br/>$gettext("Week")</th>
-        <th class="hilo_month">&nbsp;<br/>$gettext("Month")</th>
+        <th>&#xA0;<br/>$gettext("Today")</th>
+        <th class="hilo_week">&#xA0;<br/>$gettext("Week")</th>
+        <th class="hilo_month">&#xA0;<br/>$gettext("Month")</th>
         <th class="hilo_year">
-          <a onclick="toggle_rainyear()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>$gettext("Year")</a>
+          <a onclick="toggle_rainyear()">&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;<br/>$gettext("Year")</a>
         </th>
         <th class="hilo_rainyear">
           <a onclick="toggle_rainyear()">$gettext("Rain<br/>Year")</a>

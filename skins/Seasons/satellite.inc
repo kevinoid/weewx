@@ -9,7 +9,7 @@
   <div class="widget_title">
     Satellite
     <a class="widget_control"
-      onclick="toggle_widget('satellite')">&diams;</a>
+      onclick="toggle_widget('satellite')">&#x2666;</a>
   </div>
 
   <div class="widget_contents">

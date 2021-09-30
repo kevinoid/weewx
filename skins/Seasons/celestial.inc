@@ -56,19 +56,19 @@
           </tr>
           <tr>
             <td class="label">$gettext("Azimuth")</td>
-            <td class="data">$("%.1f&deg;" % $almanac.sun.az)</td>
+            <td class="data">$("%.1f&#xB0;" % $almanac.sun.az)</td>
           </tr>
           <tr>
             <td class="label">$pgettext("Astronomical", "Altitude")</td>
-            <td class="data">$("%.1f&deg;" % $sun_altitude)</td>
+            <td class="data">$("%.1f&#xB0;" % $sun_altitude)</td>
           </tr>
           <tr>
             <td class="label">$gettext("Right ascension")</td>
-            <td class="data">$("%.1f&deg;" % $almanac.sun.ra)</td>
+            <td class="data">$("%.1f&#xB0;" % $almanac.sun.ra)</td>
           </tr>
           <tr>
             <td class="label">$gettext("Declination")</td>
-            <td class="data">$("%.1f&deg;" % $almanac.sun.dec)</td>
+            <td class="data">$("%.1f&#xB0;" % $almanac.sun.dec)</td>
           </tr>
           #if $almanac.next_equinox.raw < $almanac.next_solstice.raw
             ## The equinox is before the solstice. Display them in order.
@@ -100,7 +100,7 @@
       <div class="celestial_body">
         <table class="celestial">
           <tr><th>&#9789; $gettext("Moon")</th><th></th></tr>
-          <tr><td class="label">&nbsp;</td><td class="data">&nbsp;</td></tr>
+          <tr><td class="label">&#xA0;</td><td class="data">&#xA0;</td></tr>
           <tr>
             <td class="label">$gettext("Rise")</td>
             <td class="data">$almanac.moon.rise</td>
@@ -113,22 +113,22 @@
             <td class="label">$gettext("Set")</td>
             <td class="data">$almanac.moon.set</td>
           </tr>
-          <tr><td class="label">&nbsp;</td><td class="data">&nbsp;</td></tr>
+          <tr><td class="label">&#xA0;</td><td class="data">&#xA0;</td></tr>
           <tr>
             <td class="label">$gettext("Azimuth")</td>
-            <td class="data">$("%.1f&deg;" % $almanac.moon.az)</td>
+            <td class="data">$("%.1f&#xB0;" % $almanac.moon.az)</td>
           </tr>
           <tr>
             <td class="label">$pgettext("Astronomical", "Altitude")</td>
-            <td class="data">$("%.1f&deg;" % $almanac.moon.alt)</td>
+            <td class="data">$("%.1f&#xB0;" % $almanac.moon.alt)</td>
           </tr>
           <tr>
             <td class="label">$gettext("Right ascension")</td>
-            <td class="data">$("%.1f&deg;" % $almanac.moon.ra)</td>
+            <td class="data">$("%.1f&#xB0;" % $almanac.moon.ra)</td>
           </tr>
           <tr>
             <td class="label">$gettext("Declination")</td>
-            <td class="data">$("%.1f&deg;" % $almanac.moon.dec)</td>
+            <td class="data">$("%.1f&#xB0;" % $almanac.moon.dec)</td>
           </tr>
           #if $almanac.next_full_moon.raw < $almanac.next_new_moon.raw
             <tr>

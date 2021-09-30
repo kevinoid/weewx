@@ -8,7 +8,7 @@
   <div class="widget_title">
     $gettext("Current Conditions")
     <a class="widget_control"
-      onclick="toggle_widget('current')">&diams;</a>
+      onclick="toggle_widget('current')">&#x2666;</a>
   </div>
 
   <div class="widget_contents">

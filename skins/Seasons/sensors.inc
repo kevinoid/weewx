@@ -84,7 +84,7 @@ $gettext('never')
 <div id='sensors_widget' class="widget">
   <div class="widget_title">
     <a href="telemetry.html">$gettext("Sensor Status")</a>
-    <a class="widget_control" onclick="toggle_widget('sensors')">&diams;</a>
+    <a class="widget_control" onclick="toggle_widget('sensors')">&#x2666;</a>
   </div>
   <div class="widget_contents">
   <table>

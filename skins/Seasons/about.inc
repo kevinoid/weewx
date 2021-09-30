@@ -8,7 +8,7 @@
   <div class="widget_title">
     $gettext("About this station")
     <a class="widget_control"
-      onclick="toggle_widget('about')">&diams;</a>
+      onclick="toggle_widget('about')">&#x2666;</a>
   </div>
   <div class="widget_contents">
   <table>
@@ -18,11 +18,11 @@
     </tr>
     <tr>
       <td class="label">$gettext("Latitude")</td>
-      <td class="data">$station.latitude[0]&deg; $station.latitude[1]' $station.latitude[2]</td>
+      <td class="data">$station.latitude[0]&#xB0; $station.latitude[1]' $station.latitude[2]</td>
     </tr>
     <tr>
       <td class="label">$gettext("Longitude")</td>
-      <td class="data">$station.longitude[0]&deg; $station.longitude[1]' $station.longitude[2]</td>
+      <td class="data">$station.longitude[0]&#xB0; $station.longitude[1]' $station.longitude[2]</td>
     </tr>
     <tr>
       <td class="label">$pgettext("Geographical", "Altitude")</td>

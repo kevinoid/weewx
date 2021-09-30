@@ -9,7 +9,7 @@
   <div class="widget_title">
     Location
     <a class="widget_control"
-      onclick="toggle_widget('map')">&diams;</a>
+      onclick="toggle_widget('map')">&#x2666;</a>
   </div>
   <div class="widget_contents">
     <div id='map_canvas'"></div>  
