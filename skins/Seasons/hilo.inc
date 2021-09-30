@@ -30,12 +30,8 @@
         <th>&#xA0;<br/>$gettext("Today")</th>
         <th class="hilo_week">&#xA0;<br/>$gettext("Week")</th>
         <th class="hilo_month">&#xA0;<br/>$gettext("Month")</th>
-        <th class="hilo_year">
-          <a onclick="toggle_rainyear()">&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;<br/>$gettext("Year")</a>
-        </th>
-        <th class="hilo_rainyear">
-          <a onclick="toggle_rainyear()">$gettext("Rain<br/>Year")</a>
-        </th>
+        <th class="hilo_year">&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;<br/>$gettext("Year")</th>
+        <th class="hilo_rainyear">$gettext("Rain<br/>Year")</th>
         <td></td>
       </tr>
 
