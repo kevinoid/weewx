@@ -363,7 +363,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     )
 
                 try:
-                    with open(img_file, 'wb') as json_file:
+                    with open(img_file, 'w') as json_file:
                         json.dump(
                             plotly_data,
                             json_file,
