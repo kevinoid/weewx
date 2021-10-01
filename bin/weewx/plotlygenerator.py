@@ -448,7 +448,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 })
             return (line_data,)
         elif plot_type == 'bar':
-            if _is_uniform(bar_width):
+            if _all_equal(bar_width):
                 # Uniform widths can be a single value to reduce space
                 bar_width_ms = bar_width[0] * 1000
             else:
@@ -858,10 +858,27 @@ def _get_time_format(minstamp, maxstamp):
     return u"%X"
 
 
-def _is_uniform(iterable):
-    """Tests if all values in an iterable are equal."""
+def _all_equal(iterable):
+    """
+    Check if all values in an :class:`Iterable` are equal.
+
+    Note: Same signature and behavior as ``more_itertools.all_equal``,
+    different implementation (which checks for equality to first value rather
+    than using ``itertools.groupby``).
+
+    Args:
+        iterable (Iterable[Any]): Iterable of values to check for equality.
+
+    Returns:
+        bool: ``False`` if ``iterable`` contains two values which are not equal
+            to each other, otherwise ``True``.
+    """
     iterator = iter(iterable)
-    first = iterator.next()
+    try:
+        first = next(iterator)
+    except StopIteration:
+        # Empty iterable.  Match more_itertools.all_equal behavior.
+        return True
     for val in iterator:
         if val != first:
             return False
