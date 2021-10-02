@@ -373,7 +373,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                         last_vector_options = line_options
 
                     # Any data in this line? If so, then set have_some_data to True
-                    have_some_data |= any(x for x in new_data_vec_t[0] if x is not None)
+                    have_some_data |= any(x is not None for x in new_data_vec_t[0])
 
                 plotly_data = self._gen_plotly(
                     plot                 = plot,
