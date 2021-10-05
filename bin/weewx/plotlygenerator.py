@@ -51,7 +51,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
 
     def run(self):
         self.setup()
-        self.genImages(self.gen_ts)
+        self.gen_images(self.gen_ts)
 
     def setup(self):
         try:
@@ -77,7 +77,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
         # ensure that we are in a consistent right location
         os.chdir(self.image_dict['skin_dir'])
 
-    def genImages(self, gen_ts):
+    def gen_images(self, gen_ts):
         """Generate plotly JSON files.
 
         The time scales will be chosen to include the given timestamp, with nice beginning and
@@ -117,7 +117,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 img_file = os.path.join(image_root, '%s.plotly.json' % plotname)
 
                 # Check whether this plot needs to be done at all:
-                if skipThisPlot(plotgen_ts, plot_options, img_file):
+                if _skip_this_plot(plotgen_ts, plot_options, img_file):
                     continue
 
                 # Generate the plot.
@@ -153,7 +153,21 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                      self.skin_dict['REPORT_NAME'], t2 - t1)
 
     def gen_plot(self, plotgen_ts, plot_options, plot_dict):
-        """Generate a single plot image."""
+        """Generate a single plot image.
+
+        Args:
+            plotgen_ts: A timestamp for which the plot will be valid. This is generally the last
+            datum to be plotted.
+
+            plot_options: A dictionary of plot options.
+
+            plot_dict: A section in a ConfigObj. Each subsection will contain data about plots
+            to be generated
+
+        Returns:
+            An instance of weeplot.genplot.TimePlot or None. If the former, it will be ready
+            to render. If None, then skip_if_empty was truthy and no valid data were found.
+        """
 
         # Create a new instance of a time plot and start adding to it
         plot = weeplot.genplot.TimePlot(plot_options)
@@ -1038,7 +1052,7 @@ def _time_to_iso(time_ts):
     return local_dt.isoformat() + ('%+03d:%02d' % (offset_hr, offset_min))
 
 
-def skipThisPlot(time_ts, plot_options, img_file):
+def _skip_this_plot(time_ts, plot_options, img_file):
     """A plot can be skipped if it was generated recently and has not changed. This happens if the
     time since the plot was generated is less than the aggregation interval.
 
