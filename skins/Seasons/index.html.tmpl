@@ -68,7 +68,7 @@
       #end if
     #end for
     #if $show_plot
-            <img src="${plot_name}.png" data-plotly="${plot_name}.plotly.json" alt="${plot_name}"/>
+            <span data-plotly="${plot_name}.plotly.json"></span>
     #end if
   #end if
   #for plot_group in $plot_groups
@@ -84,7 +84,7 @@
       #end if
     #end for
     #if $show_plot
-            <img src="${plot_name}.png" data-plotly="${plot_name}.plotly.json" alt="${plot_name}"/>
+            <span data-plotly="${plot_name}.plotly.json"></span>
     #end if
   #end for
           </div>
