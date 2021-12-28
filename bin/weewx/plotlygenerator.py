@@ -448,7 +448,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 })
             return (line_data,)
         elif plot_type == 'bar':
-            if _all_equal(bar_width):
+            if bar_width and _all_equal(bar_width):
                 # Uniform widths can be a single value to reduce space
                 bar_width_ms = bar_width[0] * 1000
             else:
