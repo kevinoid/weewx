@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2009-2021 Tom Keffer <tkeffer@gmail.com>
+#    Copyright (c) 2009-2023 Tom Keffer <tkeffer@gmail.com>
 #    Copyright (c) 2017-2021 Kevin Locke <kevin@kevinlocke.name>
 #
 #    See the file LICENSE.txt for your full rights.
@@ -289,6 +289,10 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
             # Get the type of plot ('bar', 'line', or 'vector')
             plot_type = line_options.get('plot_type', 'line').lower()
 
+            if plot_type not in {'line', 'bar', 'vector'}:
+                log.error(f"Unknown plot type {plot_type}. Ignored")
+                continue
+
             if aggregate_type and plot_type != 'bar':
                 # If aggregating, put the point in the middle of the interval
                 start_vec_t = ValueTuple(
@@ -372,7 +376,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                     line_num % len(plot.chart_line_widths)]
 
             interval_vec = None
-            gap_fraction = None
+            line_gap_fraction = None
             vector_rotate = None
 
             # Some plot types require special treatments:
@@ -383,15 +387,12 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
             elif plot_type == 'bar':
                 interval_vec = [x[1] - x[0] for x in
                                 zip(start_vec_t.value, stop_vec_t.value)]
-            elif plot_type == 'line':
-                gap_fraction = to_float(line_options.get('line_gap_fraction'))
-                if gap_fraction is not None and not 0 < gap_fraction < 1:
+            if plot_type in ('line', 'bar'):
+                line_gap_fraction = to_float(line_options.get('line_gap_fraction'))
+                if line_gap_fraction and not 0 <= line_gap_fraction <= 1:
                     log.error("Gap fraction %5.3f outside range 0 to 1. Ignored.",
-                              gap_fraction)
-                    gap_fraction = None
-            else:
-                log.error("Unknown plot type '%s'. Ignored", plot_type)
-                continue
+                              line_gap_fraction)
+                    line_gap_fraction = None
 
             # Get the type of line (only 'solid' or 'none' for now)
             line_type = line_options.get('line_type', 'solid')
@@ -414,7 +415,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
                 marker_size=marker_size,
                 bar_width=interval_vec,
                 vector_rotate=vector_rotate,
-                gap_fraction=gap_fraction,
+                line_gap_fraction=line_gap_fraction,
                 x_label_format=x_label_format,
                 y_label=unit_label,
                 minstamp=minstamp,
@@ -462,7 +463,7 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
             marker_size,
             bar_width,
             vector_rotate,
-            gap_fraction,
+            line_gap_fraction,
             x_label_format,
             y_label,
             minstamp,
@@ -485,8 +486,8 @@ class PlotlyJSONGenerator(weewx.reportengine.ReportGenerator):
         else:
             line_mode = 'none'
 
-        if gap_fraction is not None and plot_type != 'vector':
-            maxdx = (maxstamp - minstamp) * gap_fraction
+        if line_gap_fraction is not None and plot_type != 'vector':
+            maxdx = (maxstamp - minstamp) * line_gap_fraction
             x, y = _add_gaps(x, y, maxdx)
 
         line_data = {
