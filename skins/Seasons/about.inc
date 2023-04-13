@@ -40,10 +40,6 @@
       <td class="label">$gettext("WeeWX version")</td>
       <td class="data">$station.version</td>
     </tr>
-    <tr>
-      <td class="label">$gettext("Skin")</td>
-      <td class="data">$SKIN_NAME $SKIN_VERSION</td>
-    </tr>
   </table>
   </div>
 
