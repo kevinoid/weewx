@@ -19,10 +19,10 @@
 
 #for $x in $observations
   #if $getVar('year.%s.has_data' % $x)
-    #if $x == 'barometer'
+    #if $x in ('altimeter', 'barometer', 'pressure')
       <tr>
-        <td class="label">$obs.label.barometer</td>
-        <td class="data">$current.barometer ($trend.barometer.formatted)</td>
+        <td class="label">$obs.label[$x]</td>
+        <td class="data">$getVar('current.' + $x) ($getVar('trend.' + $x + '.formatted'))</td>
       </tr>
     #elif $x == 'windSpeed'
       <tr>
