@@ -17,7 +17,7 @@
 
 <div id='hilo_widget' class="widget">
   <div class="widget_title">
-    <a href="statistics.html">$gettext("Statistics")</a>
+    <a href="statistics.html">$gettext("High/Low")</a>
     <a class="widget_control"
       onclick="toggle_widget('hilo')">&#x2666;</a>
   </div>
